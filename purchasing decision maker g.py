@@ -175,6 +175,6 @@ if contracts is not None:
             # 邮件草稿
             if "Consultation" in decision_msg:
                 st.info("📧 **Brouillon d'Email de consultation**")
-                subject, body = generate_email_template(target_supplier, material_choice, qty_input, de_choice, pn_choice, package_choice)
+                subject, body = generate_email_template(supplier, material_choice, qty_input, de_choice, pn_choice, package_choice)
 
                 st.text_area("Copier :", value=body, height=120)
