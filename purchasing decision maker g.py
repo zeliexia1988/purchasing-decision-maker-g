@@ -67,7 +67,7 @@ def rule_contract_purchase_dipipe(quantity, DE):
 
 def rule_factory_purchase_dipipe(quantity, DE):
     return not rule_contract_purchase_dipipe(quantity, DE) and DE >= 80
-def generate_email_template(material, quantity, de, pn, package):
+def generate_email_template(material, quantity, de, pn, package, dept):
     subject = f"Demande de prix - {material} - DE{de} PN{pn}"
     body = f"Bonjour,\n\nDans le cadre d'un nouveau projet, nous souhaiterions obtenir votre meilleure offre pour :\n- Produit : {material}\n- DE : {de} / PN : {pn}\n- Quantité : {quantity} ml\n- Conditionnement : {package}\n\nCordialement,"
     return subject, body
@@ -175,6 +175,6 @@ if contracts is not None:
             # 邮件草稿
             if "Consultation" in decision_msg:
                 st.info("📧 **Brouillon d'Email de consultation**")
-                subject, body = generate_email_template(material_choice, qty_input, de_choice, pn_choice, package_choice)
+                subject, body = generate_email_template(material_choice, qty_input, de_choice, pn_choice, package_choice,dept_full)
 
                 st.text_area("Copier :", value=body, height=120)
