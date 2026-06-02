@@ -177,4 +177,4 @@ if contracts is not None:
                 st.info("📧 **Brouillon d'Email de consultation**")
                 subject, body = generate_email_template(material_choice, qty_input, de_choice, pn_choice, package_choice,dept_full)
 
-                st.text_area("Copier :", value=body, height=120)
+                st.text_area("Copier :", value=body, height=350)
