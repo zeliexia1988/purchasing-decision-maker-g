@@ -152,7 +152,8 @@ if contracts is not None:
                 price_table = calculate_all_totals(material_choice, de_choice, pn_choice, qty_input, package_choice, dept_code, today)
                 decision_msg = "✅ Decision: Application tarif contractuelle"
             elif rule_factory_purchase(qty_input, package_choice, de_choice):
-                decision_msg = "✅ Decision: Consultation Fabricant (Elydan, Centraltubi)"
+                price_table = calculate_all_totals(material_choice, de_choice, pn_choice, qty_input, package_choice, dept_code, today)
+                decision_msg = "✅ Decision: Consultation Fabricant (Elydan, Centraltubi) pour avoir meilleure prix que les conditions contractuels "
             else:
                 decision_msg = "🛒 Decision: Consultation Négoce"
 
