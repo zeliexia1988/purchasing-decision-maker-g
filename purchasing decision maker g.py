@@ -44,7 +44,7 @@ def rule_distributor_purchase(quantity, package, DE):
     return (package == "couronne" or DE < 125 or (DE < 200 and quantity < 960) or ( 225 <= DE <= 355 and quantity < 360)
 
 def rule_contract_purchase(quantity, package, DE):
-    return ((package == "barre" and 125 <= DE <= 200 and 960 <= quantity <2000))
+    return ((package == "barre" and 125 <= DE <= 200 and 960 <= quantity <2000)
             or (package == "barre" and 225 <= DE <= 355 and <= 360 quantity < 1000))
 
 def rule_factory_purchase(quantity, package, DE):
