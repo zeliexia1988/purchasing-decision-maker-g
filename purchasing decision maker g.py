@@ -177,4 +177,25 @@ if contracts is not None:
                 st.info("📧 **Brouillon d'Email de consultation**")
                 subject, body = generate_email_template(material_choice, qty_input, de_choice, pn_choice, package_choice,dept_full)
 
-                st.text_area("Copier :", value=body, height=350)
+                st.text_area("Copier :", value=body, height=350)*
+                
+                safe_subject = urllib.parse.quote(subject)
+                safe_body = urllib.parse.quote(body)
+                mailto_link = f"mailto:?subject={safe_subject}&body={safe_body}"
+                
+                st.markdown(f'''
+                <a href="{mailto_link}" target="_blank">
+                    <button style="
+                        background-color: #0078d4;
+                        color: white;
+                        padding: 10px 20px;
+                        border: none;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-weight: bold;">
+                        📩 Ouvrir dans Outlook
+                    </button>
+                </a>
+            ''', unsafe_allow_html=True)
+
+
