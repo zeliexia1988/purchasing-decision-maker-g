@@ -41,7 +41,7 @@ contracts, transport_db, dept_options_list = load_all_data()
 # 2. 你的核心业务规则 (Rules)
 # ===============================
 def rule_distributor_purchase(quantity, package, DE):
-    return (package == "couronne" or DE < 125 or (DE < 200 and quantity < 960) or ( 225 <= DE <= 355 and quantity < 360)
+    return (package == "couronne" or DE < 125 or (DE < 200 and quantity < 960) or (225 <= DE <= 355 and quantity < 360)
 
 def rule_contract_purchase(quantity, package, DE):
     return ((package == "barre" and 125 <= DE <= 200 and 960 <= quantity <2000)
