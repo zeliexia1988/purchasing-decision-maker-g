@@ -67,6 +67,10 @@ def rule_contract_purchase_dipipe(quantity, DE):
 
 def rule_factory_purchase_dipipe(quantity, DE):
     return not rule_contract_purchase_dipipe(quantity, DE) and DE >= 80
+def generate_email_template(supplier, material, quantity, de, pn, package):
+    subject = f"Demande de prix - {material} - DE{de} PN{pn}"
+    body = f"Bonjour,\n\nDans le cadre d'un nouveau projet, nous souhaiterions obtenir votre meilleure offre pour :\n- Produit : {material}\n- DE : {de} / PN : {pn}\n- Quantité : {quantity} ml\n- Conditionnement : {package}\n\nCordialement,"
+    return subject, body
 
 # ===============================
 # 3. 价格计算逻辑 (MOQ + Transport)
@@ -169,6 +173,8 @@ if contracts is not None:
                 st.warning("⚠️ Contrat trouvé mais MOQ 12ml non renseignée dans le fichier Excel.")
             
             # 邮件草稿
-            st.info("📧 **Brouillon d'Email de consultation**")
-            body = f"Bonjour,\n\nPourriez-vous nous offrir votre meilleur prix pour {qty_input}ml de {material_choice} DE{de_choice} PN{pn_choice} ({package_choice}) livré au Dpt {dept_code}?"
-            st.text_area("Copier :", value=body, height=120)
+            if "Consultation" in decision_msg:
+                st.info("📧 **Brouillon d'Email de consultation**")
+                subject, body = generate_email_template(target_supplier, material_choice, qty_input, de_choice, pn_choice, package_choice)
+
+                st.text_area("Copier :", value=body, height=120)
