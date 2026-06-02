@@ -68,8 +68,8 @@ def rule_contract_purchase_dipipe(quantity, DE):
 def rule_factory_purchase_dipipe(quantity, DE):
     return not rule_contract_purchase_dipipe(quantity, DE) and DE >= 80
 def generate_email_template(material, quantity, de, pn, package, dept):
-    subject = f"Demande de prix - {material} - DE{de} PN{pn}"
-    body = f"Bonjour,\n\nDans le cadre d'un nouveau projet, nous souhaiterions obtenir votre meilleure offre pour :\n- Produit : {material}\n- DE : {de} / PN : {pn}\n- Quantité : {quantity} ml\n Departement : {dept}\n- Conditionnement : {package}\n\nCordialement,"
+    subject = f"Demande de prix - {material} - DE{de} PN{pn} - {dept}"
+    body = f"Bonjour,\n\nDans le cadre d'un nouveau projet, nous souhaiterions obtenir votre meilleure offre pour :\n- Produit : {material}\n- DE : {de} / PN : {pn}\n- Quantité : {quantity} ml\n- Conditionnement : {package}\n- Departement : {dept}\n\n Merci par avance.\nCordialement,"
     return subject, body
 
 # ===============================
