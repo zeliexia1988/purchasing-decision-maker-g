@@ -47,16 +47,17 @@ def load_all_data():
         df_negoce.columns = df_negoce.columns.str.strip()
 
         expected_cols = ["Package", "DE", "SDR", "PN", "Price", "Supplier",
-                          "Material", "Valid_Until", "ml par unit", "Franco"]
+                          "Material", "ml par unit", "Franco"]
+        optional_cols = ["Valid_Until"]
         col_lookup = {c.lower().strip(): c for c in df_negoce.columns}
         rename_map = {}
         missing_cols = []
-        for expected in expected_cols:
+        for expected in expected_cols + optional_cols:
             key = expected.lower().strip()
             if key in col_lookup:
                 if col_lookup[key] != expected:
                     rename_map[col_lookup[key]] = expected
-            else:
+            elif expected in expected_cols:
                 missing_cols.append(expected)
 
         if rename_map:
@@ -69,6 +70,9 @@ def load_all_data():
             )
             for col in missing_cols:
                 df_negoce[col] = pd.NA
+
+        if "Valid_Until" not in df_negoce.columns:
+            df_negoce["Valid_Until"] = pd.NaT
 
         df_negoce['Package'] = df_negoce['Package'].astype(str).str.strip()
         df_negoce['Supplier'] = df_negoce['Supplier'].astype(str).str.strip()
@@ -187,7 +191,7 @@ def calculate_negoce_totals(material, de, pn, quantity, package, today):
         (negoce_db["PN"] == float(pn)) &
         (negoce_db["Package"].str.lower() == pkg_str) &
         (negoce_db["Material"].str.lower() == mat_str) &
-        (negoce_db["Valid_Until"] >= today)
+        (negoce_db["Valid_Until"].isna() | (negoce_db["Valid_Until"] >= today))
     )
     matches = negoce_db[mask].copy()
     if matches.empty:
@@ -200,7 +204,7 @@ def calculate_negoce_totals(material, de, pn, quantity, package, today):
         else:
             # Pas de longueur d'unité renseignée -> on considère le prix comme un prix au ml
             nb_unit = quantity
-        total = nb_unit * row["Price"]* quantity
+        total = nb_unit * row["Price"]
         return pd.Series({"Nb_Unites": nb_unit, "Total_HT": total})
 
     calc = matches.apply(_compute, axis=1)
@@ -225,8 +229,8 @@ def calculate_negoce_totals(material, de, pn, quantity, package, today):
     display_df["Nb Unités"] = display_df["Nb Unités"].astype(int)
     display_df["Prix/Unité (€)"] = display_df["Prix/Unité (€)"].map("{:,.2f} €".format)
     display_df["TOTAL HT (€)"] = display_df["TOTAL HT (€)"].map("{:,.2f} €".format)
-    
-    return display_df.reset_index(drop=True)
+
+    return display_df
 
 # ===============================
 # 4. Streamlit UI
