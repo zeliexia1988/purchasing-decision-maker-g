@@ -222,9 +222,10 @@ def calculate_negoce_totals(material, de, pn, quantity, package, today):
 
     display_df = matches[["Supplier", "Price", "ml par unit", "Nb_Unites", "Total_HT", "Franco_Status"]].copy()
     display_df.columns = ["Fournisseur", "Prix/Unité (€)", "Longueur/Unité", "Nb Unités", "TOTAL HT (€)", "Statut Franco"]
+    display_df["Nb Unités"] = display_df["Nb Unités"].astype(int)
     display_df["Prix/Unité (€)"] = display_df["Prix/Unité (€)"].map("{:,.2f} €".format)
     display_df["TOTAL HT (€)"] = display_df["TOTAL HT (€)"].map("{:,.2f} €".format)
-
+    
     return display_df
 
 # ===============================
