@@ -204,7 +204,7 @@ def calculate_negoce_totals(material, de, pn, quantity, package, today):
         else:
             # Pas de longueur d'unité renseignée -> on considère le prix comme un prix au ml
             nb_unit = quantity
-        total = nb_unit * row["Price"]
+        total = nb_unit * row["Price"] * (ml_val if ml_val and ml_val > 0 else 1)
         return pd.Series({"Nb_Unites": nb_unit, "Total_HT": total})
 
     calc = matches.apply(_compute, axis=1)
@@ -230,7 +230,7 @@ def calculate_negoce_totals(material, de, pn, quantity, package, today):
     display_df["Prix/Unité (€)"] = display_df["Prix/Unité (€)"].map("{:,.2f} €".format)
     display_df["TOTAL HT (€)"] = display_df["TOTAL HT (€)"].map("{:,.2f} €".format)
 
-    return display_df
+    return display_df.reset_index(drop=True)
 
 # ===============================
 # 4. Streamlit UI
