@@ -226,7 +226,7 @@ def calculate_negoce_totals(material, de, pn, quantity, package, today):
     display_df["Prix/Unité (€)"] = display_df["Prix/Unité (€)"].map("{:,.2f} €".format)
     display_df["TOTAL HT (€)"] = display_df["TOTAL HT (€)"].map("{:,.2f} €".format)
     
-    return display_df
+    return display_df.reset_index(drop=True)
 
 # ===============================
 # 4. Streamlit UI
