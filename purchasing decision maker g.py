@@ -200,7 +200,7 @@ def calculate_negoce_totals(material, de, pn, quantity, package, today):
         else:
             # Pas de longueur d'unité renseignée -> on considère le prix comme un prix au ml
             nb_unit = quantity
-        total = nb_unit * row["Price"]
+        total = nb_unit * row["Price"]* quantity
         return pd.Series({"Nb_Unites": nb_unit, "Total_HT": total})
 
     calc = matches.apply(_compute, axis=1)
