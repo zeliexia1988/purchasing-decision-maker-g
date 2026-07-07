@@ -42,7 +42,34 @@ def load_all_data():
 
         # 4. 加载 négoce 价格表 (contracts_negoce.xlsx)
         df_negoce = pd.read_excel("contracts_negoce.xlsx")
+        # 统一去除列名前后空格，并做大小写不敏感的列名匹配，避免因为
+        # "Franco"/"FRANCO"/"Franco " 这类差异导致 KeyError
         df_negoce.columns = df_negoce.columns.str.strip()
+
+        expected_cols = ["Package", "DE", "SDR", "PN", "Price", "Supplier",
+                          "Material", "Valid_Until", "ml par unit", "Franco"]
+        col_lookup = {c.lower().strip(): c for c in df_negoce.columns}
+        rename_map = {}
+        missing_cols = []
+        for expected in expected_cols:
+            key = expected.lower().strip()
+            if key in col_lookup:
+                if col_lookup[key] != expected:
+                    rename_map[col_lookup[key]] = expected
+            else:
+                missing_cols.append(expected)
+
+        if rename_map:
+            df_negoce = df_negoce.rename(columns=rename_map)
+
+        if missing_cols:
+            st.warning(
+                f"⚠️ Colonnes manquantes dans contracts_negoce.xlsx : {missing_cols}. "
+                f"Colonnes trouvées : {list(df_negoce.columns)}"
+            )
+            for col in missing_cols:
+                df_negoce[col] = pd.NA
+
         df_negoce['Package'] = df_negoce['Package'].astype(str).str.strip()
         df_negoce['Supplier'] = df_negoce['Supplier'].astype(str).str.strip()
         df_negoce['Material'] = df_negoce['Material'].astype(str).str.strip()
