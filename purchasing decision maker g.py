@@ -300,8 +300,10 @@ if contracts is not None:
             if "Application" in decision_msg:
                 st.warning("⚠️ Contrat trouvé mais MOQ 12ml non renseignée dans le fichier Excel.")
 
-            # 邮件草稿 -> uniquement si aucun prix négoce n'a été trouvé
-            if "Consultation" in decision_msg:
+            # 邮件草稿 -> 只要不是 "Application tarif contractuel(le)"，其余所有决策情况都显示邮件
+            show_email = "Application" not in decision_msg
+ 
+        if show_email:
                 st.info("📧 **Brouillon d'Email de consultation**")
                 subject, body = generate_email_template(material_choice, qty_input, de_choice, pn_choice, package_choice, dept_full)
 
