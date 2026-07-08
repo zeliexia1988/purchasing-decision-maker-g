@@ -289,11 +289,11 @@ if contracts is not None:
         st.subheader(decision_msg)
 
         if price_table is not None:
-            st.write("### 💰 Comparatif des prix (Transport inclus)")
+            st.write("### 💰 Comparatif des prix contractuels des Fabricants (Transport inclus)")
             st.table(price_table)
 
         elif negoce_table is not None:
-            st.write("### 💰 Comparatif des prix Négoce (avec condition Franco)")
+            st.write("### 💰 Comparatif des prix contractuels des Négoces (avec condition Franco)")
             st.table(negoce_table)
 
         else:
