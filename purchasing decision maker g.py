@@ -301,7 +301,7 @@ if contracts is not None:
                 st.warning("⚠️ Contrat trouvé mais MOQ 12ml non renseignée dans le fichier Excel.")
 
             # 邮件草稿 -> 只要不是 "Application tarif contractuel(le)"，其余所有决策情况都显示邮件
-            show_email = "Application" not in decision_msg
+        show_email = "Application" not in decision_msg
  
         if show_email:
                 st.info("📧 **Brouillon d'Email de consultation**")
