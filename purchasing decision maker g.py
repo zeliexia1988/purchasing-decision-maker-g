@@ -142,33 +142,49 @@ def calculate_all_totals(material, de, pn, quantity, package, dept_code, today):
     )
     valid_matches = contracts[mask].copy()
 
-    # 关键点：如果 MOQ 12ml 为空，说明不符合合同价执行条件
-    valid_matches = valid_matches[valid_matches["MOQ 12ml"].notna() & (valid_matches["MOQ 12ml"] > 0)]
+    # 不再过滤MOQ为空的行，只要Material/DE/PN/Package/Valid_Until匹配上就保留
     if valid_matches.empty:
         return None
 
-    # 计算车数
-    valid_matches["Nb_Camions"] = valid_matches["MOQ 12ml"].apply(lambda x: math.ceil(quantity / x))
+    def calc_camions(moq):
+        if pd.isna(moq) or moq <= 0:
+            return None
+        return math.ceil(quantity / moq)
 
-    # 获取对应省份和供应商的运费
+    valid_matches["Nb_Camions"] = valid_matches["MOQ 12ml"].apply(calc_camions)
+
     def get_fee(supplier):
         fee_m = (transport_db["Supplier"].str.contains(supplier, case=False, na=False)) & (transport_db["Dpt"] == str(dept_code))
         res = transport_db[fee_m]["Transport"]
         return res.iloc[0] if not res.empty else 0
 
     valid_matches["Transport_Unit"] = valid_matches["Supplier"].apply(get_fee)
-
-    # 金额计算
     valid_matches["Material_Total"] = valid_matches["Price"] * quantity
-    valid_matches["Total_Transport"] = valid_matches["Nb_Camions"] * valid_matches["Transport_Unit"]
-    valid_matches["Grand_Total"] = valid_matches["Material_Total"] + valid_matches["Total_Transport"]
+
+    def calc_transport_total(row):
+        if row["Nb_Camions"] is None:
+            return None
+        return row["Nb_Camions"] * row["Transport_Unit"]
+
+    valid_matches["Total_Transport"] = valid_matches.apply(calc_transport_total, axis=1)
+
+    def calc_grand_total(row):
+        # 没有运费信息时，总价 = 材料价（提醒用户运费另算）
+        if row["Total_Transport"] is None:
+            return row["Material_Total"]
+        return row["Material_Total"] + row["Total_Transport"]
+
+    valid_matches["Grand_Total"] = valid_matches.apply(calc_grand_total, axis=1)
 
     display_df = valid_matches[["Supplier", "Price", "Nb_Camions", "Transport_Unit", "Total_Transport", "Grand_Total"]].copy()
     display_df.columns = ["Fournisseur", "Unit (€/ml)", "Camions", "Frais/Cam", "Total Trans", "TOTAL HT"]
-
     display_df = display_df.sort_values("TOTAL HT")
-    for col in ["Unit (€/ml)", "Frais/Cam", "Total Trans", "TOTAL HT"]:
-        display_df[col] = display_df[col].map("{:,.2f} €".format)
+
+    display_df["Camions"] = display_df["Camions"].apply(lambda x: "N/A (MOQ manquant)" if pd.isna(x) else int(x))
+    display_df["Unit (€/ml)"] = display_df["Unit (€/ml)"].map("{:,.2f} €".format)
+    display_df["Frais/Cam"] = display_df["Frais/Cam"].map("{:,.2f} €".format)
+    display_df["Total Trans"] = display_df["Total Trans"].apply(lambda x: "N/A" if pd.isna(x) else f"{x:,.2f} €")
+    display_df["TOTAL HT"] = display_df["TOTAL HT"].map("{:,.2f} €".format)
     return display_df
 
 # ===============================
@@ -296,11 +312,6 @@ if contracts is not None:
             st.write("### 💰 Comparatif des prix contractuels des Négoces (avec condition Franco)")
             st.table(negoce_table)
 
-        else:
-            if "Application" in decision_msg:
-                st.warning("⚠️ Contrat trouvé mais MOQ 12ml non renseignée dans le fichier Excel.")
-
-            # 邮件草稿 -> 只要不是 "Application tarif contractuel(le)"，其余所有决策情况都显示邮件
         show_email = "Application" not in decision_msg
  
         if show_email:
